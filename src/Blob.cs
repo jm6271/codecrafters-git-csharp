@@ -32,16 +32,18 @@ class Blob
         while (i != blob.Length && blob[i] != '\0')
         {
             size += (char)blob[i];
+            i++;
         }
+        i++; // Skip null byte
 
         // Convert size value to integer
-        var contentSize = Convert.ToUInt64(size);
+        var contentSize = Convert.ToInt32(size);
 
         // Read content
         string content = "";
-        for (ulong pos = (ulong)i; pos < contentSize; pos++)
+        for (int j = 0; j < contentSize; j++)
         {
-            content += (char)blob[pos];
+            content += (char)blob[j + i];
         }
 
         return content;
@@ -56,6 +58,7 @@ class Blob
 
         // Decompress object
         using FileStream sr = new(_blobPath, FileMode.Open);
+        sr.Seek(2, SeekOrigin.Begin);
         using MemoryStream obj = new();
         using (var zlibStream = new DeflateStream(sr, CompressionMode.Decompress))
         {

@@ -7,7 +7,7 @@ class CatFile
         try
         {
             Blob blob = new(path);
-            Console.WriteLine(blob.ReadBlobContents());
+            Console.Write(blob.ReadBlobContents());
             return 0;
         }
         catch (Exception e)
