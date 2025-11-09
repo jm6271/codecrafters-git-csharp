@@ -1,23 +1,14 @@
-using System;
-using System.IO;
+using CommandLine;
 
-if (args.Length < 1)
+class Program
 {
-    Console.WriteLine("Please provide a command.");
-    return;
-}
-
-string command = args[0];
-
-if (command == "init")
-{
-    Directory.CreateDirectory(".git");
-    Directory.CreateDirectory(".git/objects");
-    Directory.CreateDirectory(".git/refs");
-    File.WriteAllText(".git/HEAD", "ref: refs/heads/main\n");
-    Console.WriteLine("Initialized git directory");
-}
-else
-{
-    throw new ArgumentException($"Unknown command {command}");
+    static int Main(string[] args)
+    {
+        return Parser.Default.ParseArguments<InitOptions, CatFileOptions>(args)
+            .MapResult(
+                (InitOptions opts) => Init.Run(),
+                (CatFileOptions opts) => CatFile.Run(opts.BlobName),
+                errs => 1
+            );
+    }
 }
