@@ -1,3 +1,4 @@
+using System.Dynamic;
 using CommandLine;
 
 [Verb("cat-file", HelpText = "Display the contents of a blob")]
@@ -11,4 +12,14 @@ class CatFileOptions
 class InitOptions
 {
 
+}
+
+[Verb("hash-object", HelpText = "Compute the SHA-1 has of an object")]
+class HashObjectOptions
+{
+    [Option('w', Required = false, HelpText = "Write the object")]
+    public bool Write { get; set; } = false;
+
+    [Value(0, MetaName = "filename", Required = true, HelpText = "Path to file to compute hash of")]
+    public string Filename { get; set; } = "";
 }

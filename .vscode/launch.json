@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Console Debug",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/bin/Debug/net9.0/codecrafters-git.dll",
+            "args": ["hash-object", "-w", "hello.txt"],
+            "cwd": "${workspaceFolder}/../hello/", 
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        }
+    ]
+}
