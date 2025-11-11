@@ -23,3 +23,13 @@ class HashObjectOptions
     [Value(0, MetaName = "filename", Required = true, HelpText = "Path to file to compute hash of")]
     public string Filename { get; set; } = "";
 }
+
+[Verb("ls-tree", HelpText = "Display the entries in a tree object")]
+class LsTreeOptions
+{
+    [Option("name-only")]
+    public bool NameOnly { get; set; } = false;
+
+    [Value(0, MetaName = "tree sha", Required = true, HelpText = "SHA-1 of tree")]
+    public string SHA1 { get; set; } = "";
+}
