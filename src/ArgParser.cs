@@ -30,12 +30,26 @@ class LsTreeOptions
     [Option("name-only")]
     public bool NameOnly { get; set; } = false;
 
-    [Value(0, MetaName = "tree sha", Required = true, HelpText = "SHA-1 of tree")]
+    [Value(0, MetaName = "tree", Required = true, HelpText = "SHA-1 of tree")]
     public string SHA1 { get; set; } = "";
 }
 
 [Verb("write-tree", HelpText = "Write current directory as a tree")]
 class WriteTreeOptions
 {
-    
+
 }
+
+[Verb("commit-tree", HelpText = "Commit a tree")]
+class CommitTreeOptions
+{
+    [Option('p', Required = true, HelpText = "Parent commit SHA-1")]
+    public string ParentSha { get; set; } = "";
+
+    [Option('m', Required = true, HelpText = "Commit message")]
+    public string Message { get; set; } = "";
+
+    [Value(0, MetaName = "tree", Required = true, HelpText = "SHA-1 of tree to commit")]
+    public string TreeSha { get; set; } = "";
+}
+
