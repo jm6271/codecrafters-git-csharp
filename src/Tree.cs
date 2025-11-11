@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text;
 
 public class Tree
 {
@@ -16,7 +17,7 @@ public class Tree
 
         return names;
     }
-    
+
     public static List<TreeEntry> ReadEntries(string treeHash)
     {
         // read object and decompress with zlib
@@ -87,6 +88,85 @@ public class Tree
 
         return entries;
     }
+    
+    public static string WriteTreeObject(string directoryPath)
+    {
+        // Write the specified directory as a tree, and return the SHA-1 hash
+
+        List<TreeEntry> entries = [];
+
+        List<string> directoryEntries = [.. Directory.GetFileSystemEntries(directoryPath)];
+
+        foreach (var entry in directoryEntries)
+        {
+            TreeEntry treeEntry = new TreeEntry();
+            FileAttributes attr = File.GetAttributes(entry);
+            if (attr.HasFlag(FileAttributes.Directory))
+            {
+                // Directory
+
+                // Make sure this isn't the .git directory
+                if (Path.GetFileName(entry) == ".git")
+                    continue;
+
+                treeEntry.Mode = "40000";
+                treeEntry.Name = Path.GetFileName(entry);
+                treeEntry.SHA1Str = WriteTreeObject(entry);
+            }
+            else
+            {
+                // File
+                treeEntry.Mode = "100644";
+
+                treeEntry.Name = Path.GetFileName(entry);
+
+                StreamReader sr = new(entry);
+                string content = sr.ReadToEnd();
+                sr.Close();
+                treeEntry.SHA1Str = Blob.WriteBlob(content);
+            }
+            entries.Add(treeEntry);
+        }
+
+        // Sort entries by name
+        entries = [.. entries.OrderBy(e => e.Name)];
+
+        // Write the entries to a tree object
+        List<byte> treeContents = [];
+        foreach (var entry in entries)
+        {
+            var mode = Encoding.UTF8.GetBytes(entry.Mode + " ");
+            treeContents.AddRange(mode);
+
+            var name = Encoding.UTF8.GetBytes(entry.Name + "\0");
+            treeContents.AddRange(name);
+
+            treeContents.AddRange(entry.SHA1);
+        }
+
+        // Compute length
+        string treeLength = treeContents.Count.ToString();
+
+        // Create tree object
+        List<byte> treeObject = [];
+        var header = Encoding.UTF8.GetBytes("tree " + treeLength + "\0");
+        treeObject.AddRange(header);
+        treeObject.AddRange(treeContents);
+
+        var tree = treeObject.ToArray();
+
+        // Compute SHA-1 hash
+        var treeHash = Blob.ComputeFileSha1(tree);
+
+        // Write to disk with ZLib
+        string treePath = GetFullPathToObject(treeHash);
+        Directory.CreateDirectory(Directory.GetParent(treePath)?.FullName ?? "");
+        using FileStream outputStream = new(treePath, FileMode.Create);
+        using var zlibStream = new ZLibStream(outputStream, CompressionMode.Compress);
+        zlibStream.Write(tree, 0, tree.Length);
+
+        return treeHash;
+    }
 
     private static byte[] ReadTreeObject(string treeHash)
     {
@@ -106,8 +186,8 @@ public class Tree
         return obj.ToArray();
     }
     
-    private static string GetFullPathToObject(string blob)
+    private static string GetFullPathToObject(string hash)
     {
-        return $".git/objects/{blob[..2]}/{blob[2..]}";
+        return $".git/objects/{hash[..2]}/{hash[2..]}";
     }
 }

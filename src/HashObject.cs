@@ -15,7 +15,7 @@ static class HashObject
                 StreamReader sr = new(filepath);
                 string content = sr.ReadToEnd();
                 sr.Close();
-                var hash = Blob.WriteBlob(filepath, content);
+                var hash = Blob.WriteBlob(content);
                 Console.WriteLine(hash);
             }
             return 0;

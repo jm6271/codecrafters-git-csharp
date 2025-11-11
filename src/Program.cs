@@ -7,12 +7,14 @@ class Program
         return Parser.Default.ParseArguments<InitOptions,
                                             CatFileOptions,
                                             HashObjectOptions,
-                                            LsTreeOptions>(args)
+                                            LsTreeOptions,
+                                            WriteTreeOptions>(args)
             .MapResult(
                 (InitOptions opts) => Init.Run(),
                 (CatFileOptions opts) => CatFile.Run(opts.BlobName),
                 (HashObjectOptions opts) => HashObject.Run(opts.Filename, opts.Write),
                 (LsTreeOptions opts) => LsTree.Run(opts.SHA1, opts.NameOnly),
+                (WriteTreeOptions opts) => WriteTree.Run(),
                 errs => 1
             );
     }

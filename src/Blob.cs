@@ -63,7 +63,7 @@ static class Blob
         return obj.ToArray();
     }
 
-    public static string WriteBlob(string filepath, string contents)
+    public static string WriteBlob(string contents)
     {
         // Create blob string
         string blob = "blob ";

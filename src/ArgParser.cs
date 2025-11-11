@@ -33,3 +33,9 @@ class LsTreeOptions
     [Value(0, MetaName = "tree sha", Required = true, HelpText = "SHA-1 of tree")]
     public string SHA1 { get; set; } = "";
 }
+
+[Verb("write-tree", HelpText = "Write current directory as a tree")]
+class WriteTreeOptions
+{
+    
+}
